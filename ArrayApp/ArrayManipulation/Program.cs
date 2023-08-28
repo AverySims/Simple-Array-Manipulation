@@ -6,33 +6,37 @@ namespace ArrayManipulation
 {
 	internal class Program
 	{
-		static double[] customArray;
-		static int customSize;
-		
-		private static readonly string[] MenuOptions = 
-			{"Find minimum and maximum", 
-				"Calculate sum and average", 
-				"Reverse the array", 
-				"Sort the array", 
-				"Add element", 
-				"Remove element", 
-				"View elements",
-				"Exit program"
-			};
+		private static double[] _customArray;
+		private static int _customSize;
+
+		// splitting menu options into separate string arrays for "easier" sorting
+		private static readonly string[] ArrayOptions =
+			{ "Create new array", "Add array element", "Remove array element", "View array elements" };
+
+		private static readonly string[] ArrayFunctionOptions =
+			{ "Find minimum and maximum", "Calculate sum and average", "Reverse the array", "Sort the array" };
+
+		private static readonly string[] ProgramOptions = { "Exit program" };
 
 		static void Main(string[] args)
 		{
 			bool loopMain = true;
-			bool loopSelections = true;
+			
+			// combining array lengths to find the range of selectable menu options
+			int menuOptions = ArrayOptions.Length + ArrayFunctionOptions.Length + ProgramOptions.Length;
 
+			// having separate loops for the program, allowing 
 			while (loopMain)
 			{
+				bool loopSelections = true;
+
 				InitializeArray();
 				
 				while (loopSelections)
 				{
 					PrintMenu();
-					SelectMenuOption();
+
+					SelectMenuOption(menuOptions, out loopMain, out loopSelections);
 				}
 				
 			}
@@ -46,8 +50,8 @@ namespace ArrayManipulation
 			Console.Write("Enter the size of your array: ");
 			do
 			{
-				customSize = GenericReadLine.TryReadLine<int>();
-				if (customSize >= 1)
+				_customSize = GenericReadLine.TryReadLine<int>();
+				if (_customSize >= 1)
 				{
 					// valid array size, continue program
 					tempValid = true;
@@ -60,45 +64,66 @@ namespace ArrayManipulation
 			} while( !tempValid );
 
 			// initializing new array
-			customArray = new double[customSize];
+			_customArray = new double[_customSize];
 
 			Console.WriteLine("Enter the elements of your array:");
-			for (int i = 0; i < customSize; i++)
+			for (int i = 0; i < _customSize; i++)
 			{
-				Console.Write($"Index {i}: ");
-				customArray[i] = GenericReadLine.TryReadLine<double>();
+				Console.Write($"Array element {i}: ");
+				_customArray[i] = GenericReadLine.TryReadLine<double>();
 			}
 		}
-		
+
 		static void PrintMenu()
 		{
+			// saving all option arrays in an array of string arrays and calling printing them via a foreach loop.
+			// if you want a unique option that doesn't really fit in a array with other options, just make it an
+			// array with a single entry and add it to the local array below.
+			string[][] tempArray = { ArrayOptions, ArrayFunctionOptions, ProgramOptions };
+			
+			int tempIndex = 0;
+
+			Console.Clear();
+
 			Console.WriteLine("- - - Menu - - -");
 
-			for (int i = 0; i < MenuOptions.Length; i++)
+			foreach (var option in tempArray)
 			{
-				Console.WriteLine($"{i + 1}. {MenuOptions[i]}");
+				for (int i = 0; i < option.Length; i++)
+				{
+					Console.WriteLine($"{tempIndex + 1}. {option[i]}");
+					tempIndex++;
+				}
+				ConsoleHelper.PrintBlank();
 			}
 
-			Console.Write("Enter your choice: ");
 		}
 
-		static void SelectMenuOption()
+		static void SelectMenuOption(int menuOptions, out bool loopMain, out bool loopSub)
 		{
 			bool loopTemp = true;
-
-			int tempSelect = 0;
+			loopMain = true;
+			loopSub = true;
 
 			while (loopTemp)
 			{
 				bool tempValid = false;
+				int tempSelect = 0;
+
+				ConsoleHelper.PrintBlank();
+
 				Console.Write("Select option: ");
 				do
 				{
-					 tempSelect = GenericReadLine.TryReadLine<int>();
-					if (tempSelect >= 1 && tempSelect <= MenuOptions.Length)
+					tempSelect = GenericReadLine.TryReadLine<int>();
+					if (tempSelect >= 1 && tempSelect <= menuOptions)
 					{
 						// selection valid, continue program
 						tempValid = true;
+
+						
+						PrintMenu();
+
 					}
 					else
 					{
@@ -109,29 +134,36 @@ namespace ArrayManipulation
 
 				switch (tempSelect)
 				{
-					case 1:
-						FindMinMax();
+					case 1: // Create new array
+						loopSub = false;
+						loopTemp = false;
+						Console.Clear();
 						break;
-					case 2:
-						CalculateSumAndAverage();
-						break;
-					case 3:
-						ReverseArray();
-						break;
-					case 4:
-						SortArray();
-						break;
-					case 5:
+					case 2: // Add array element
 						AddElement();
 						break;
-					case 6:
+					case 3: // Remove array element
 						RemoveElement();
 						break;
-					case 7:
+					case 4: // View array elements
 						ViewArray();
 						break;
-					case 8:
-						// exit = true;
+					case 5: // Find min and max
+						FindMinMax();
+						break;
+					case 6: // Calc sum and average
+						CalculateSumAndAverage();
+						break;
+					case 7: // Reverse array
+						ReverseArray();
+						break;
+					case 8: // Sort array
+						SortArray();
+						break;
+					case 9: // Exit program
+						loopMain = false;
+						loopSub = false;
+						loopTemp = false;
 						Console.WriteLine("Exiting program.");
 						break;
 					default:
@@ -145,14 +177,14 @@ namespace ArrayManipulation
 		
 		static void FindMinMax()
 		{
-			var min = customArray[0];
-			var max = customArray[0];
-			for (int i = 1; i < customSize; i++)
+			var min = _customArray[0];
+			var max = _customArray[0];
+			for (int i = 1; i < _customSize; i++)
 			{
-				if (customArray[i] < min)
-					min = customArray[i];
-				if (customArray[i] > max)
-					max = customArray[i];
+				if (_customArray[i] < min)
+					min = _customArray[i];
+				if (_customArray[i] > max)
+					max = _customArray[i];
 			}
 			Console.WriteLine($"Minimum: {min}, Maximum: {max}");
 		}
@@ -160,24 +192,24 @@ namespace ArrayManipulation
 		static void CalculateSumAndAverage()
 		{
 			double sum = 0;
-			for (int i = 0; i < customSize; i++)
+			for (int i = 0; i < _customSize; i++)
 			{
-				sum += customArray[i];
+				sum += _customArray[i];
 			}
-			double average = sum / customSize;
+			double average = sum / _customSize;
 			Console.WriteLine($"Sum: {sum}");
 			Console.WriteLine($"Average: {average}");
 		}
 
 		static void ReverseArray()
 		{
-			Array.Reverse(customArray);
+			Array.Reverse(_customArray);
 			Console.WriteLine("Array reversed.");
 		}
 
 		static void SortArray()
 		{
-			Array.Sort(customArray);
+			Array.Sort(_customArray);
 			Console.WriteLine("Array sorted.");
 		}
 
@@ -186,29 +218,29 @@ namespace ArrayManipulation
 			Console.Write("Enter the element to add: ");
 			var newElement = GenericReadLine.TryReadLine<double>();
 
-			if (customSize == customArray.Length)
+			if (_customSize == _customArray.Length)
 			{
-				Array.Resize(ref customArray, customSize * 2); // Double the array size
+				Array.Resize(ref _customArray, _customSize * 2); // Double the array size
 			}
 
-			customArray[customSize] = newElement;
-			customSize++;
+			_customArray[_customSize] = newElement;
+			_customSize++;
 			Console.WriteLine("Element added.");
 		}
 
 		static void RemoveElement()
 		{
-			if (customSize > 0)
+			if (_customSize > 0)
 			{
 				Console.Write("Enter the index of the element to remove: ");
 				int indexToRemove = GenericReadLine.TryReadLine<int>();
-				if (indexToRemove >= 0 && indexToRemove < customSize)
+				if (indexToRemove >= 0 && indexToRemove < _customSize)
 				{
-					for (int i = indexToRemove; i < customSize - 1; i++)
+					for (int i = indexToRemove; i < _customSize - 1; i++)
 					{
-						customArray[i] = customArray[i + 1];
+						_customArray[i] = _customArray[i + 1];
 					}
-					customSize--;
+					_customSize--;
 					Console.WriteLine("Element removed.");
 				}
 				else
@@ -224,11 +256,21 @@ namespace ArrayManipulation
 
 		static void ViewArray()
 		{
-			Console.WriteLine("Array Contents:");
-			for (int i = 0; i < customSize; i++)
+			// checking if array size is 0 to determine displayed console message
+			if (_customSize <= 0)
 			{
-				Console.WriteLine($"Index {i}: {customArray[i]}");
+				Console.WriteLine("Array is empty, cannot display elements");
 			}
+			else
+			{
+				Console.WriteLine("Array Contents:");
+
+				for (int i = 0; i < _customSize; i++)
+				{
+					Console.WriteLine($"Index {i}: {_customArray[i]}");
+				}
+			}
+			
 		}
 	}
 }
