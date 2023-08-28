@@ -6,7 +6,8 @@ namespace ArrayManipulation
 {
 	internal class Program
 	{
-		private static double[] _customArray;
+		// initializing array with 1 element to prevent 'nullreference' warnings
+		private static double[] _customArray = { 0 };
 		private static int _customSize;
 
 		// splitting menu options into separate string arrays for "easier" sorting
@@ -18,40 +19,55 @@ namespace ArrayManipulation
 
 		private static readonly string[] ProgramOptions = { "Exit program" };
 
+		private static bool _loopMain = true;
+		private static bool _loopMenu = true;
+
 		static void Main(string[] args)
 		{
-			bool loopMain = true;
 			
 			// combining array lengths to find the range of selectable menu options
-			int menuOptions = ArrayOptions.Length + ArrayFunctionOptions.Length + ProgramOptions.Length;
+			int menuOptionCount = ArrayOptions.Length + ArrayFunctionOptions.Length + ProgramOptions.Length;
 
 			// having separate loops for the program, allowing 
-			while (loopMain)
+			while (_loopMain)
 			{
-				bool loopSelections = true;
-
 				InitializeArray();
 				
-				while (loopSelections)
+				while (_loopMenu)
 				{
 					PrintMenu();
 
-					SelectMenuOption(menuOptions, out loopMain, out loopSelections);
+					SelectMenuOption(menuOptionCount);
 				}
-				
 			}
 		}
 
 		static void InitializeArray()
 		{
-			bool tempValid = false;
-			
 			// user input for array size
 			Console.Write("Enter the size of your array: ");
+
+			SetArraySize(out _customSize);
+
+			// initializing new array
+			_customArray = new double[_customSize];
+
+			Console.WriteLine("Enter the elements of your array (doubles only):");
+			for (int i = 0; i < _customSize; i++)
+			{
+				Console.Write($"Array element {i}: ");
+				_customArray[i] = GenericReadLine.TryReadLine<double>();
+			}
+		}
+
+		private static void SetArraySize(out int size)
+		{
+			bool tempValid = false;
+
 			do
 			{
-				_customSize = GenericReadLine.TryReadLine<int>();
-				if (_customSize >= 1)
+				size = GenericReadLine.TryReadLine<int>();
+				if (size >= 1)
 				{
 					// valid array size, continue program
 					tempValid = true;
@@ -61,17 +77,8 @@ namespace ArrayManipulation
 					// array size invalid
 					ConsoleHelper.PrintInvalidSelection();
 				}
-			} while( !tempValid );
+			} while (!tempValid);
 
-			// initializing new array
-			_customArray = new double[_customSize];
-
-			Console.WriteLine("Enter the elements of your array:");
-			for (int i = 0; i < _customSize; i++)
-			{
-				Console.Write($"Array element {i}: ");
-				_customArray[i] = GenericReadLine.TryReadLine<double>();
-			}
 		}
 
 		static void PrintMenu()
@@ -85,8 +92,8 @@ namespace ArrayManipulation
 
 			Console.Clear();
 
+			// printing menu options to console
 			Console.WriteLine("- - - Menu - - -");
-
 			foreach (var option in tempArray)
 			{
 				for (int i = 0; i < option.Length; i++)
@@ -96,14 +103,13 @@ namespace ArrayManipulation
 				}
 				ConsoleHelper.PrintBlank();
 			}
-
 		}
 
-		static void SelectMenuOption(int menuOptions, out bool loopMain, out bool loopSub)
+		static void SelectMenuOption(int menuOptions)
 		{
 			bool loopTemp = true;
-			loopMain = true;
-			loopSub = true;
+			_loopMain = true;
+			_loopMenu = true;
 
 			while (loopTemp)
 			{
@@ -120,10 +126,7 @@ namespace ArrayManipulation
 					{
 						// selection valid, continue program
 						tempValid = true;
-
-						
 						PrintMenu();
-
 					}
 					else
 					{
@@ -132,49 +135,55 @@ namespace ArrayManipulation
 					}
 				} while (!tempValid);
 
-				switch (tempSelect)
-				{
-					case 1: // Create new array
-						loopSub = false;
-						loopTemp = false;
-						Console.Clear();
-						break;
-					case 2: // Add array element
-						AddElement();
-						break;
-					case 3: // Remove array element
-						RemoveElement();
-						break;
-					case 4: // View array elements
-						ViewArray();
-						break;
-					case 5: // Find min and max
-						FindMinMax();
-						break;
-					case 6: // Calc sum and average
-						CalculateSumAndAverage();
-						break;
-					case 7: // Reverse array
-						ReverseArray();
-						break;
-					case 8: // Sort array
-						SortArray();
-						break;
-					case 9: // Exit program
-						loopMain = false;
-						loopSub = false;
-						loopTemp = false;
-						Console.WriteLine("Exiting program.");
-						break;
-					default:
-						ConsoleHelper.PrintInvalidSelection();
-						break;
-				}
-				
+				SwitchOnMenuSelection(tempSelect, out loopTemp);
+
 			}
-			
 		}
-		
+
+		private static void SwitchOnMenuSelection(int selection, out bool selectionLoop)
+		{
+			selectionLoop = true;
+
+			switch (selection)
+			{
+				case 1: // Create new array
+					_loopMenu = false;
+					selectionLoop = false;
+					Console.Clear();
+					break;
+				case 2: // Add array element
+					AddElement();
+					break;
+				case 3: // Remove array element
+					RemoveElement();
+					break;
+				case 4: // View array elements
+					ViewArray();
+					break;
+				case 5: // Find min and max
+					FindMinMax();
+					break;
+				case 6: // Calc sum and average
+					CalculateSumAndAverage();
+					break;
+				case 7: // Reverse array
+					ReverseArray();
+					break;
+				case 8: // Sort array
+					SortArray();
+					break;
+				case 9: // Exit program
+					_loopMain = false;
+					_loopMenu = false;
+					selectionLoop = false;
+					Console.WriteLine("Exiting program.");
+					break;
+				default:
+					ConsoleHelper.PrintInvalidSelection();
+					break;
+			}
+		}
+
 		static void FindMinMax()
 		{
 			var min = _customArray[0];
@@ -197,8 +206,7 @@ namespace ArrayManipulation
 				sum += _customArray[i];
 			}
 			double average = sum / _customSize;
-			Console.WriteLine($"Sum: {sum}");
-			Console.WriteLine($"Average: {average}");
+			Console.WriteLine($"Sum: {sum}, Average: {average}");
 		}
 
 		static void ReverseArray()
@@ -225,7 +233,7 @@ namespace ArrayManipulation
 
 			_customArray[_customSize] = newElement;
 			_customSize++;
-			Console.WriteLine("Element added.");
+			Console.WriteLine("New element added.");
 		}
 
 		static void RemoveElement()
@@ -270,7 +278,6 @@ namespace ArrayManipulation
 					Console.WriteLine($"Index {i}: {_customArray[i]}");
 				}
 			}
-			
 		}
 	}
 }
