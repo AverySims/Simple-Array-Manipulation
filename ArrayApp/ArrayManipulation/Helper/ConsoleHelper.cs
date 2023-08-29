@@ -43,18 +43,6 @@ namespace ConsoleFunctions
 		}
 
 		#region Parsing
-		// EC = Error correction
-		// function is private because we have a better version in 'GenericReadLine' class
-		private static bool ParseIntEC(out int val)
-		{
-			return int.TryParse(Console.ReadLine(), out val);
-		}
-		// function is private because we have a better version in 'GenericReadLine' class
-		private static bool ParseDoubleEC(out double val)
-		{
-			return double.TryParse(Console.ReadLine(), out val);
-		}
-
 		public static ConsoleKeyInfo UserEndProgram()
 		{
 			Console.WriteLine("Input any key to close program...");

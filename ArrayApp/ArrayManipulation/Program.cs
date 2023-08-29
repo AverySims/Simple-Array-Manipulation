@@ -28,13 +28,16 @@ namespace ArrayManipulation
 			// combining array lengths to find the range of selectable menu options
 			int menuOptionCount = ArrayOptions.Length + ArrayFunctionOptions.Length + ProgramOptions.Length;
 
-			// having separate loops for the program, allowing 
 			while (_loopMain)
 			{
 				InitializeArray();
-				
+
+				_loopMenu = true;
+
 				while (_loopMenu)
 				{
+					Console.Clear();
+					
 					PrintMenu();
 
 					SelectMenuOption(menuOptionCount);
@@ -64,6 +67,7 @@ namespace ArrayManipulation
 		{
 			bool tempValid = false;
 
+			// looping until a valid array size is selected
 			do
 			{
 				size = GenericReadLine.TryReadLine<int>();
@@ -87,9 +91,9 @@ namespace ArrayManipulation
 			// if you want a unique option that doesn't really fit in a array with other options, just make it an
 			// array with a single entry and add it to the local array below.
 			string[][] tempArray = { ArrayOptions, ArrayFunctionOptions, ProgramOptions };
-			
 			int tempIndex = 0;
 
+			// clearing console to prevent clutter
 			Console.Clear();
 
 			// printing menu options to console
@@ -107,48 +111,37 @@ namespace ArrayManipulation
 
 		static void SelectMenuOption(int menuOptions)
 		{
-			bool loopTemp = true;
 			_loopMain = true;
 			_loopMenu = true;
 
-			while (loopTemp)
+			// looping until a valid option is selected
+			while (true)
 			{
-				bool tempValid = false;
-				int tempSelect = 0;
-
+				// printing blank line to prevent clutter
 				ConsoleHelper.PrintBlank();
-
 				Console.Write("Select option: ");
-				do
+				int tempSelect = GenericReadLine.TryReadLine<int>();
+
+				if (!SwitchOnMenuSelection(tempSelect))
 				{
-					tempSelect = GenericReadLine.TryReadLine<int>();
-					if (tempSelect >= 1 && tempSelect <= menuOptions)
-					{
-						// selection valid, continue program
-						tempValid = true;
-						PrintMenu();
-					}
-					else
-					{
-						// selection invalid
-						ConsoleHelper.PrintInvalidSelection();
-					}
-				} while (!tempValid);
-
-				SwitchOnMenuSelection(tempSelect, out loopTemp);
-
+					break;
+				}
 			}
 		}
 
-		private static void SwitchOnMenuSelection(int selection, out bool selectionLoop)
+		private static bool SwitchOnMenuSelection(int selection)
 		{
-			selectionLoop = true;
+			bool tempReturnValue = true;
+
+			// clearing console and printing menu again to prevent clutter
+			Console.Clear();
+			PrintMenu();
 
 			switch (selection)
 			{
 				case 1: // Create new array
 					_loopMenu = false;
-					selectionLoop = false;
+					tempReturnValue = false;
 					Console.Clear();
 					break;
 				case 2: // Add array element
@@ -168,20 +161,25 @@ namespace ArrayManipulation
 					break;
 				case 7: // Reverse array
 					ReverseArray();
+					ViewArray();
 					break;
 				case 8: // Sort array
 					SortArray();
+					ViewArray();
 					break;
 				case 9: // Exit program
+					// setting both loops to false will exit the program
+					tempReturnValue = false;
 					_loopMain = false;
 					_loopMenu = false;
-					selectionLoop = false;
 					Console.WriteLine("Exiting program.");
 					break;
 				default:
 					ConsoleHelper.PrintInvalidSelection();
 					break;
 			}
+			// returning true will keep the program running, false will exit the program
+			return tempReturnValue;
 		}
 
 		static void FindMinMax()
