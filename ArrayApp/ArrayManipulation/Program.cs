@@ -117,8 +117,6 @@ namespace ArrayManipulation
 			// looping until a valid option is selected
 			while (true)
 			{
-				// printing blank line to prevent clutter
-				ConsoleHelper.PrintBlank();
 				Console.Write("Select option: ");
 				int tempSelect = GenericReadLine.TryReadLine<int>();
 
@@ -178,6 +176,8 @@ namespace ArrayManipulation
 					ConsoleHelper.PrintInvalidSelection();
 					break;
 			}
+
+			ConsoleHelper.PrintBlank();
 			// returning true will keep the program running, false will exit the program
 			return tempReturnValue;
 		}
@@ -239,19 +239,23 @@ namespace ArrayManipulation
 			if (_customSize > 0)
 			{
 				Console.Write("Enter the index of the element to remove: ");
-				int indexToRemove = GenericReadLine.TryReadLine<int>();
-				if (indexToRemove >= 0 && indexToRemove < _customSize)
+				while (true)
 				{
-					for (int i = indexToRemove; i < _customSize - 1; i++)
+					int indexToRemove = GenericReadLine.TryReadLine<int>();
+					if (indexToRemove >= 0 && indexToRemove < _customSize)
 					{
-						_customArray[i] = _customArray[i + 1];
+						for (int i = indexToRemove; i < _customSize - 1; i++)
+						{
+							_customArray[i] = _customArray[i + 1];
+						}
+						_customSize--;
+						Console.WriteLine("Element removed.");
+						break;
 					}
-					_customSize--;
-					Console.WriteLine("Element removed.");
-				}
-				else
-				{
-					Console.WriteLine("Invalid index.");
+					else
+					{
+						Console.Write("Invalid index, enter a valid index: ");
+					}
 				}
 			}
 			else
