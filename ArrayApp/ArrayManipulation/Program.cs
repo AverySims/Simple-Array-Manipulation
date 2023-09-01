@@ -24,10 +24,6 @@ namespace ArrayManipulation
 
 		static void Main(string[] args)
 		{
-			
-			// combining array lengths to find the range of selectable menu options
-			int menuOptionCount = ArrayOptions.Length + ArrayFunctionOptions.Length + ProgramOptions.Length;
-
 			while (_loopMain)
 			{
 				InitializeArray();
@@ -40,7 +36,7 @@ namespace ArrayManipulation
 					
 					PrintMenu();
 
-					SelectMenuOption(menuOptionCount);
+					SelectMenuOption();
 				}
 			}
 		}
@@ -97,7 +93,7 @@ namespace ArrayManipulation
 			ConsoleHelper.PrintStrings(tempArray);
 		}
 
-		static void SelectMenuOption(int menuOptions)
+		static void SelectMenuOption()
 		{
 			_loopMain = true;
 			_loopMenu = true;
