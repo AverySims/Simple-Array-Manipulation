@@ -1,4 +1,4 @@
-﻿using ConsoleFunctions;
+﻿using CustomConsole;
 using GenericParse;
 
 
@@ -91,22 +91,10 @@ namespace ArrayManipulation
 			// if you want a unique option that doesn't really fit in a array with other options, just make it an
 			// array with a single entry and add it to the local array below.
 			string[][] tempArray = { ArrayOptions, ArrayFunctionOptions, ProgramOptions };
-			int tempIndex = 0;
-
-			// clearing console to prevent clutter
-			Console.Clear();
 
 			// printing menu options to console
 			Console.WriteLine("- - - Menu - - -");
-			foreach (var option in tempArray)
-			{
-				for (int i = 0; i < option.Length; i++)
-				{
-					Console.WriteLine($"{tempIndex + 1}. {option[i]}");
-					tempIndex++;
-				}
-				ConsoleHelper.PrintBlank();
-			}
+			ConsoleHelper.PrintStrings(tempArray);
 		}
 
 		static void SelectMenuOption(int menuOptions)
@@ -117,6 +105,7 @@ namespace ArrayManipulation
 			// looping until a valid option is selected
 			while (true)
 			{
+				ConsoleHelper.PrintBlank();
 				Console.Write("Select option: ");
 				int tempSelect = GenericReadLine.TryReadLine<int>();
 
@@ -134,6 +123,7 @@ namespace ArrayManipulation
 			// clearing console and printing menu again to prevent clutter
 			Console.Clear();
 			PrintMenu();
+			ConsoleHelper.PrintBlank();
 
 			switch (selection)
 			{
@@ -176,8 +166,6 @@ namespace ArrayManipulation
 					ConsoleHelper.PrintInvalidSelection();
 					break;
 			}
-
-			ConsoleHelper.PrintBlank();
 			// returning true will keep the program running, false will exit the program
 			return tempReturnValue;
 		}
